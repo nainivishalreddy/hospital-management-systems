@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account - ApexCare Hospital Management System</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Bootstrap 5.3 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    :root {
+      --reg-primary: #0284c7;
+      --reg-secondary: #0d9488;
+      --reg-dark: #0f172a;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 15% 15%, rgba(2, 132, 199, 0.08) 0%, transparent 45%),
+                  radial-gradient(circle at 85% 85%, rgba(13, 148, 136, 0.08) 0%, transparent 45%),
+                  linear-gradient(135deg, #f8fafc 0%, #e0f2fe 50%, #f0fdfa 100%);
+      display: flex;
+      flex-direction: column;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .auth-nav {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .auth-main-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      border-radius: 20px;
+      box-shadow: 0 25px 50px -12px rgba(2, 132, 199, 0.15), 0 10px 20px -5px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+    }
+
+    .auth-hero-banner {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 40%, #0d9488 100%);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 3rem 2.5rem;
+    }
+
+    .auth-hero-banner::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -30%;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .auth-hero-banner::after {
+      content: '';
+      position: absolute;
+      bottom: -20%;
+      left: -20%;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .feature-point {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.95rem;
+    }
+
+    .feature-icon-box {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      flex-shrink: 0;
+    }
+
+    .auth-brand-badge {
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #0284c7 0%, #0d9488 100%);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 8px 18px rgba(2, 132, 199, 0.3);
+    }
+
+    .role-toggle-group {
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: 12px;
+      display: flex;
+      gap: 4px;
+    }
+
+    .role-toggle-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 9px 16px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #64748b;
+      border-radius: 9px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .role-toggle-btn.active {
+      background: #ffffff;
+      color: #0284c7;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+
+    .form-section-title {
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #0284c7;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e2e8f0;
+    }
+
+    .input-group-custom {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 11px;
+      overflow: hidden;
+      background: #fff;
+      transition: all 0.2s ease;
+    }
+
+    .input-group-custom:focus-within {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+    }
+
+    .input-group-custom .input-group-text {
+      background: #f8fafc;
+      border: none;
+      color: #64748b;
+      padding-left: 0.9rem;
+      padding-right: 0.7rem;
+    }
+
+    .input-group-custom .form-control,
+    .input-group-custom .form-select {
+      border: none;
+      padding: 0.65rem 0.85rem 0.65rem 0.3rem;
+      font-size: 0.92rem;
+      background: transparent;
+    }
+
+    .input-group-custom .form-control:focus,
+    .input-group-custom .form-select:focus {
+      box-shadow: none;
+    }
+
+    .btn-gradient-primary {
+      background: linear-gradient(135deg, #0284c7 0%, #0284c7 60%, #0d9488 100%);
+      color: #fff;
+      border: none;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      border-radius: 12px;
+      transition: all 0.25s ease;
+    }
+
+    .btn-gradient-primary:hover {
+      background: linear-gradient(135deg, #0369a1 0%, #0284c7 60%, #0f766e 100%);
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3);
+    }
+
+    .demo-autofill-banner {
+      background: #f0f9ff;
+      border: 1.5px dashed #bae6fd;
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header Navigation -->
+  <header class="auth-nav py-3">
+    <div class="container d-flex justify-content-between align-items-center">
+      <a href="index.html" class="text-decoration-none d-flex align-items-center gap-2">
+        <div class="navbar-brand-badge" style="width: 40px; height: 40px; font-size: 1.25rem;">
+          <i class="fa-solid fa-hospital"></i>
+        </div>
+        <div>
+          <span class="brand-title fs-5 fw-bold text-dark d-block lh-1">ApexCare</span>
+          <span class="brand-subtitle text-muted" style="font-size: 0.7rem; font-weight: 600;">HOSPITAL SYSTEM</span>
+        </div>
+      </a>
+      
+      <div class="d-flex align-items-center gap-2">
+        <a href="index.html" class="btn btn-outline-secondary btn-sm rounded-pill px-3 d-none d-sm-inline-flex align-items-center gap-1">
+          <i class="fa-solid fa-house me-1"></i> Public Home
+        </a>
+        <a href="login.html" class="btn btn-primary btn-sm rounded-pill px-3 d-flex align-items-center gap-1 fw-bold shadow-sm">
+          <i class="fa-solid fa-right-to-bracket me-1"></i> Sign In to Portal
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Registration Section -->
+  <main class="container my-auto py-5">
+    <div class="row justify-content-center">
+      <div class="col-xl-11 col-lg-12">
+        <div class="auth-main-card">
+          <div class="row g-0">
+            
+            <!-- Left Showcase Column -->
+            <div class="col-lg-4 d-none d-lg-flex auth-hero-banner">
+              <div>
+                <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-bold text-uppercase mb-3" style="font-size: 0.72rem; letter-spacing: 0.05em;">
+                  <i class="fa-solid fa-id-card me-1"></i> Medical Registration
+                </span>
+                <h3 class="fw-bold text-white mb-3">Begin Your Journey to Better Health</h3>
+                <p class="text-white-50 mb-4" style="font-size: 0.92rem;">
+                  Create your personal ApexCare medical account to schedule consultations, view electronic prescriptions, and manage medical records from any device.
+                </p>
+
+                <div class="feature-point">
+                  <div class="feature-icon-box"><i class="fa-solid fa-stethoscope text-white"></i></div>
+                  <div>
+                    <strong class="d-block text-white">Top Specialists</strong>
+                    <span class="text-white-50 small">Consult with certified board physicians</span>
+                  </div>
+                </div>
+
+                <div class="feature-point">
+                  <div class="feature-icon-box"><i class="fa-solid fa-notes-medical text-white"></i></div>
+                  <div>
+                    <strong class="d-block text-white">Digital Health Record</strong>
+                    <span class="text-white-50 small">All diagnosis, notes, and bills securely stored</span>
+                  </div>
+                </div>
+
+                <div class="feature-point">
+                  <div class="feature-icon-box"><i class="fa-solid fa-shield-virus text-white"></i></div>
+                  <div>
+                    <strong class="d-block text-white">Private & Confidential</strong>
+                    <span class="text-white-50 small">Encrypted medical data protection</span>
+                  </div>
+                </div>
+
+                <!-- 1-Click Auto Fill Demo Button -->
+                <div class="mt-4 pt-3 border-top border-white border-opacity-25">
+                  <span class="text-white-50 small d-block mb-2">Want to test registration quickly?</span>
+                  <div class="d-flex flex-column gap-2">
+                    <button type="button" class="btn btn-light btn-sm fw-bold text-primary rounded-pill py-2 shadow-sm text-start ps-3" onclick="autofillSamplePatient()">
+                      <i class="fa-solid fa-magic me-2 text-warning"></i> Auto-Fill Sample Patient Data
+                    </button>
+                    <button type="button" class="btn btn-outline-light btn-sm rounded-pill py-2 text-start ps-3" onclick="autofillSampleDoctor()">
+                      <i class="fa-solid fa-user-doctor me-2"></i> Auto-Fill Sample Doctor Data
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-3 border-top border-white border-opacity-25 mt-4">
+                <div class="d-flex align-items-center justify-content-between text-white-50 small">
+                  <span><i class="fa-solid fa-circle-check me-1"></i> Instant Activation</span>
+                  <span><i class="fa-solid fa-bolt me-1"></i> Zero Maven Required</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Registration Form Column -->
+            <div class="col-lg-8 p-4 p-sm-5 bg-white">
+              
+              <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="auth-brand-badge">
+                    <i class="fa-solid fa-user-plus"></i>
+                  </div>
+                  <div>
+                    <h3 class="fw-bold text-dark mb-0">Create New Account</h3>
+                    <p class="text-muted small mb-0">Join ApexCare Hospital Management Platform</p>
+                  </div>
+                </div>
+
+                <!-- Account Type Selector -->
+                <div class="role-toggle-group" id="accountTypeSelector">
+                  <button type="button" class="role-toggle-btn active" id="btnTypePatient" onclick="switchAccountType('PATIENT')">
+                    <i class="fa-solid fa-user-injured me-1"></i> Patient Account
+                  </button>
+                  <button type="button" class="role-toggle-btn" id="btnTypeDoctor" onclick="switchAccountType('DOCTOR')">
+                    <i class="fa-solid fa-user-doctor me-1"></i> Doctor / Staff
+                  </button>
+                </div>
+              </div>
+
+              <!-- Quick Autofill Helper for Mobile / Tablet -->
+              <div class="demo-autofill-banner d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4 d-lg-none">
+                <span class="small text-primary fw-bold">
+                  <i class="fa-solid fa-wand-magic-sparkles me-1 text-warning"></i> Quick Test:
+                </span>
+                <div class="d-flex gap-2">
+                  <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3" onclick="autofillSamplePatient()">
+                    Fill Sample Patient
+                  </button>
+                  <button type="button" class="btn btn-outline-success btn-sm rounded-pill px-3" onclick="autofillSampleDoctor()">
+                    Fill Doctor
+                  </button>
+                </div>
+              </div>
+
+              <!-- Alert Feedback Container -->
+              <div id="regAlertBox" class="alert d-none py-2 small mb-3"></div>
+
+              <!-- Registration Form -->
+              <form id="standaloneRegisterForm">
+                
+                <!-- SECTION 1: Credentials -->
+                <div class="form-section-title">
+                  <i class="fa-solid fa-key"></i> Account Credentials
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-sm-6">
+                    <label class="form-label small fw-bold text-muted">Full Legal Name *</label>
+                    <div class="input-group input-group-custom">
+                      <span class="input-group-text"><i class="fa-solid fa-signature"></i></span>
+                      <input type="text" id="regFullName" class="form-control" placeholder="e.g. Eleanor Vance" required>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label small fw-bold text-muted">Username *</label>
+                    <div class="input-group input-group-custom">
+                      <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
+                      <input type="text" id="regUsername" class="form-control" placeholder="e.g. eleanor.v" required>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label small fw-bold text-muted">Email Address *</label>
+                    <div class="input-group input-group-custom">
+                      <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                      <input type="email" id="regEmail" class="form-control" placeholder="e.g. eleanor@example.com" required>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label small fw-bold text-muted">Phone Number *</label>
+                    <div class="input-group input-group-custom">
+                      <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                      <input type="tel" id="regPhone" class="form-control" placeholder="+1-555-0244" required>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label small fw-bold text-muted">Password *</label>
+                    <div class="input-group input-group-custom">
+                      <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                      <input type="password" id="regPassword" class="form-control" placeholder="Min. 6 characters" required>
+                      <button type="button" class="btn btn-link text-muted pe-3 text-decoration-none" onclick="toggleRegPassword('regPassword', 'regPassIcon1')">
+                        <i class="fa-regular fa-eye" id="regPassIcon1"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="col-sm-6">
+                    <label class="form-label small fw-bold text-muted">Confirm Password *</label>
+                    <div class="input-group input-group-custom">
+                      <span class="input-group-text"><i class="fa-solid fa-shield-halved"></i></span>
+                      <input type="password" id="regConfirmPassword" class="form-control" placeholder="Repeat password" required>
+                      <button type="button" class="btn btn-link text-muted pe-3 text-decoration-none" onclick="toggleRegPassword('regConfirmPassword', 'regPassIcon2')">
+                        <i class="fa-regular fa-eye" id="regPassIcon2"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- PATIENT SPECIFIC FIELDS -->
+                <div id="patientSpecificSection">
+                  <div class="form-section-title">
+                    <i class="fa-solid fa-heart-pulse"></i> Patient Health & Personal Info
+                  </div>
+
+                  <div class="row g-3 mb-3">
+                    <div class="col-sm-4">
+                      <label class="form-label small fw-bold text-muted">Date of Birth</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-regular fa-calendar"></i></span>
+                        <input type="date" id="regDob" class="form-control" value="1995-06-15">
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <label class="form-label small fw-bold text-muted">Gender</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-venus-mars"></i></span>
+                        <select id="regGender" class="form-select">
+                          <option value="Female">Female</option>
+                          <option value="Male">Male</option>
+                          <option value="Other">Other</option>
+                          <option value="Prefer not to say">Prefer not to say</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <label class="form-label small fw-bold text-muted">Blood Group</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-droplet text-danger"></i></span>
+                        <select id="regBloodGroup" class="form-select">
+                          <option value="O+">O+ (Positive)</option>
+                          <option value="O-">O- (Negative)</option>
+                          <option value="A+">A+ (Positive)</option>
+                          <option value="A-">A- (Negative)</option>
+                          <option value="B+">B+ (Positive)</option>
+                          <option value="B-">B- (Negative)</option>
+                          <option value="AB+">AB+ (Positive)</option>
+                          <option value="AB-">AB- (Negative)</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">Residential Address</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
+                        <input type="text" id="regAddress" class="form-control" placeholder="Street, City, Postal Code">
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">Emergency Contact</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-phone-volume text-warning"></i></span>
+                        <input type="text" id="regEmergencyContact" class="form-control" placeholder="e.g. Marcus Vance (+1-555-9111)">
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label small fw-bold text-muted">Medical History & Allergies (Optional)</label>
+                      <textarea id="regMedicalHistory" class="form-control" rows="2" placeholder="List any known allergies, chronic illnesses, or current medications..." style="border: 1.5px solid #e2e8f0; border-radius: 11px; font-size: 0.92rem;"></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- DOCTOR SPECIFIC FIELDS (Hidden by default) -->
+                <div id="doctorSpecificSection" class="d-none">
+                  <div class="form-section-title">
+                    <i class="fa-solid fa-stethoscope"></i> Clinical Qualifications & Department
+                  </div>
+
+                  <div class="row g-3 mb-3">
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">Department *</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-hospital-user"></i></span>
+                        <select id="regDocDepartment" class="form-select">
+                          <option value="Cardiology">Cardiology</option>
+                          <option value="Neurology">Neurology</option>
+                          <option value="Pediatrics">Pediatrics</option>
+                          <option value="Orthopedics">Orthopedics</option>
+                          <option value="General Medicine">General Medicine</option>
+                          <option value="Dermatology">Dermatology</option>
+                          <option value="Oncology">Oncology</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">Specialization *</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-award"></i></span>
+                        <input type="text" id="regDocSpecialization" class="form-control" placeholder="e.g. Interventional Cardiology">
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">Qualification *</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-graduation-cap"></i></span>
+                        <input type="text" id="regDocQualification" class="form-control" placeholder="e.g. MD, FACC, Johns Hopkins">
+                      </div>
+                    </div>
+                    <div class="col-sm-3">
+                      <label class="form-label small fw-bold text-muted">Experience (Years)</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-user-clock"></i></span>
+                        <input type="number" id="regDocExperience" class="form-control" value="8" min="1">
+                      </div>
+                    </div>
+                    <div class="col-sm-3">
+                      <label class="form-label small fw-bold text-muted">Consultation Fee ($)</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-dollar-sign"></i></span>
+                        <input type="number" id="regDocFee" class="form-control" value="150" min="10">
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">Available Days & Hours</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-regular fa-clock"></i></span>
+                        <input type="text" id="regDocAvailability" class="form-control" value="Mon - Fri, 09:00 AM - 04:00 PM">
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">OPD Room Number</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-door-open"></i></span>
+                        <input type="text" id="regDocRoom" class="form-control" value="Opd-305">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Terms & Agreement Checkbox -->
+                <div class="form-check mb-4">
+                  <input class="form-check-input" type="checkbox" id="regTermsCheck" required checked>
+                  <label class="form-check-label small text-muted" for="regTermsCheck">
+                    I acknowledge and agree to the <a href="javascript:void(0)" class="text-primary text-decoration-none fw-semibold" onclick="alert('ApexCare Hospital System Terms:\n1. Your health data is securely encrypted.\n2. Appointments are confirmed in real-time.\n3. Zero Maven setup required!')">ApexCare Electronic Medical System Terms</a> & Privacy Policy.
+                  </label>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="regSubmitBtn" class="btn btn-gradient-primary w-100 py-3 fw-bold fs-6 mb-3 shadow">
+                  <i class="fa-solid fa-user-check me-2"></i> Complete Registration & Sign In
+                </button>
+              </form>
+
+              <!-- Footer Navigation -->
+              <div class="text-center pt-3 border-top">
+                <span class="text-muted small">Already have an account? </span>
+                <a href="login.html" class="fw-bold text-primary text-decoration-none small">
+                  Sign In to Portal <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-3 text-center text-muted small mt-auto">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>&copy; 2026 ApexCare Hospital Management System. All rights reserved.</div>
+      <div class="d-flex gap-3">
+        <a href="login.html" class="text-muted text-decoration-none">Sign In</a>
+        <a href="index.html" class="text-muted text-decoration-none">Hospital Home</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    let currentAccountType = 'PATIENT';
+
+    function switchAccountType(type) {
+      currentAccountType = type;
+      const btnPat = document.getElementById('btnTypePatient');
+      const btnDoc = document.getElementById('btnTypeDoctor');
+      const patSec = document.getElementById('patientSpecificSection');
+      const docSec = document.getElementById('doctorSpecificSection');
+      const submitBtn = document.getElementById('regSubmitBtn');
+
+      if (type === 'DOCTOR') {
+        btnDoc.classList.add('active');
+        btnPat.classList.remove('active');
+        patSec.classList.add('d-none');
+        docSec.classList.remove('d-none');
+        submitBtn.innerHTML = '<i class="fa-solid fa-user-doctor me-2"></i> Register Doctor Profile & Sign In';
+      } else {
+        btnPat.classList.add('active');
+        btnDoc.classList.remove('active');
+        patSec.classList.remove('d-none');
+        docSec.classList.add('d-none');
+        submitBtn.innerHTML = '<i class="fa-solid fa-user-check me-2"></i> Complete Patient Registration & Sign In';
+      }
+    }
+
+    function toggleRegPassword(fieldId, iconId) {
+      const field = document.getElementById(fieldId);
+      const icon = document.getElementById(iconId);
+      if (field.type === 'password') {
+        field.type = 'text';
+        icon.className = 'fa-regular fa-eye-slash';
+      } else {
+        field.type = 'password';
+        icon.className = 'fa-regular fa-eye';
+      }
+    }
+
+    function showAlert(msg, type = 'danger') {
+      const alertBox = document.getElementById('regAlertBox');
+      alertBox.className = `alert alert-${type} py-2 small mb-3 border`;
+      alertBox.innerHTML = (type === 'success' ? '<i class="fa-solid fa-circle-check me-2"></i>' : '<i class="fa-solid fa-triangle-exclamation me-2"></i>') + msg;
+      alertBox.classList.remove('d-none');
+      alertBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function autofillSamplePatient() {
+      switchAccountType('PATIENT');
+      const randNum = Math.floor(100 + Math.random() * 900);
+      document.getElementById('regFullName').value = 'Eleanor Vance';
+      document.getElementById('regUsername').value = `eleanor.vance${randNum}`;
+      document.getElementById('regEmail').value = `eleanor${randNum}@example.com`;
+      document.getElementById('regPhone').value = '+1-555-0391';
+      document.getElementById('regPassword').value = 'patient123';
+      document.getElementById('regConfirmPassword').value = 'patient123';
+      document.getElementById('regDob').value = '1996-08-24';
+      document.getElementById('regGender').value = 'Female';
+      document.getElementById('regBloodGroup').value = 'A+';
+      document.getElementById('regAddress').value = '842 Broadway Ave, Suite 4B, New York';
+      document.getElementById('regEmergencyContact').value = 'Marcus Vance (+1-555-9118)';
+      document.getElementById('regMedicalHistory').value = 'Mild asthma, allergic to peanuts. No prior surgeries.';
+      showAlert('Sample patient data filled! Click "Complete Patient Registration" to test.', 'info');
+    }
+
+    function autofillSampleDoctor() {
+      switchAccountType('DOCTOR');
+      const randNum = Math.floor(100 + Math.random() * 900);
+      document.getElementById('regFullName').value = 'Dr. Alexander Hayes';
+      document.getElementById('regUsername').value = `dr.hayes${randNum}`;
+      document.getElementById('regEmail').value = `dr.hayes${randNum}@hospital.com`;
+      document.getElementById('regPhone').value = '+1-555-0888';
+      document.getElementById('regPassword').value = 'doctor123';
+      document.getElementById('regConfirmPassword').value = 'doctor123';
+      document.getElementById('regDocDepartment').value = 'Cardiology';
+      document.getElementById('regDocSpecialization').value = 'Interventional Cardiology & Cardiac Imaging';
+      document.getElementById('regDocQualification').value = 'MD, FACC - Johns Hopkins Medicine';
+      document.getElementById('regDocExperience').value = 11;
+      document.getElementById('regDocFee').value = 175;
+      document.getElementById('regDocAvailability').value = 'Mon - Fri, 09:00 AM - 04:30 PM';
+      document.getElementById('regDocRoom').value = 'Opd-312';
+      showAlert('Sample doctor data filled! Click "Register Doctor Profile" to test.', 'info');
+    }
+
+    document.getElementById('standaloneRegisterForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const fullName = document.getElementById('regFullName').value.trim();
+      const username = document.getElementById('regUsername').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirmPassword = document.getElementById('regConfirmPassword').value;
+
+      if (!fullName || !username || !email || !password) {
+        return showAlert('Please fill in all required credentials.');
+      }
+
+      if (password.length < 4) {
+        return showAlert('Password must be at least 4 characters long.');
+      }
+
+      if (password !== confirmPassword) {
+        return showAlert('Passwords do not match. Please re-enter identical passwords.');
+      }
+
+      const btn = document.getElementById('regSubmitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Creating Account...';
+
+      let payload = {
+        fullName,
+        username,
+        email,
+        phone,
+        password
+      };
+
+      if (currentAccountType === 'DOCTOR') {
+        payload.role = 'ROLE_DOCTOR';
+        payload.department = document.getElementById('regDocDepartment').value;
+        payload.specialization = document.getElementById('regDocSpecialization').value.trim() || 'Clinical Practice';
+        payload.qualification = document.getElementById('regDocQualification').value.trim() || 'MD, MBBS';
+        payload.experienceYears = Number(document.getElementById('regDocExperience').value) || 5;
+        payload.consultationFee = Number(document.getElementById('regDocFee').value) || 120;
+        payload.availableDays = 'Mon - Fri';
+        payload.availableHours = document.getElementById('regDocAvailability').value.trim() || '09:00 AM - 04:00 PM';
+        payload.roomNumber = document.getElementById('regDocRoom').value.trim() || 'Opd-201';
+      } else {
+        payload.role = 'ROLE_PATIENT';
+        payload.dateOfBirth = document.getElementById('regDob').value || '1995-01-01';
+        payload.gender = document.getElementById('regGender').value;
+        payload.bloodGroup = document.getElementById('regBloodGroup').value;
+        payload.address = document.getElementById('regAddress').value.trim();
+        payload.emergencyContact = document.getElementById('regEmergencyContact').value.trim();
+        payload.medicalHistory = document.getElementById('regMedicalHistory').value.trim() || 'None recorded';
+      }
+
+      try {
+        const res = await HospitalAPI.register(payload);
+        if (res && res.success) {
+          localStorage.setItem('HMS_LOGGED_IN', 'true');
+          if (res.user) localStorage.setItem('HMS_CURRENT_USER', JSON.stringify(res.user));
+          showAlert(`Welcome, ${res.user.fullName}! Account created successfully. Redirecting...`, 'success');
+          
+          let targetPortal = currentAccountType === 'DOCTOR' ? 'doctor' : 'patient';
+          setTimeout(() => {
+            window.location.href = `index.html?portal=${targetPortal}`;
+          }, 700);
+        } else {
+          showAlert(res.message || 'Registration failed. Username may already be in use.', 'danger');
+          btn.disabled = false;
+          btn.innerHTML = currentAccountType === 'DOCTOR' 
+            ? '<i class="fa-solid fa-user-doctor me-2"></i> Register Doctor Profile & Sign In' 
+            : '<i class="fa-solid fa-user-check me-2"></i> Complete Registration & Sign In';
+        }
+      } catch (err) {
+        showAlert('Registration error: ' + err.message, 'danger');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-user-check me-2"></i> Complete Registration & Sign In';
+      }
+    });
+  </script>
+</body>
+</html>

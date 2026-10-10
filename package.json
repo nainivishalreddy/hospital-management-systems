@@ -1,0 +1,11 @@
+{
+  "name": "hospital-management-system-frontend",
+  "version": "1.0.0",
+  "description": "ApexCare Hospital Management System Frontend",
+  "main": "../server.js",
+  "scripts": {
+    "dev": "node ../server.js",
+    "start": "node ../server.js"
+  },
+  "license": "ISC"
+}

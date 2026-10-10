@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApexCare - Hospital Management System</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Bootstrap 5.3 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  
+  <!-- Chart.js for Hospital Analytics -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Auth Session Guard: Must Login or Register First -->
+  <script>
+    (function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const isGuest = urlParams.get('guest') === 'true';
+      const isLogged = localStorage.getItem('HMS_LOGGED_IN') === 'true';
+      const currentUser = localStorage.getItem('HMS_CURRENT_USER');
+      if (!isGuest && (!isLogged || !currentUser)) {
+        window.location.replace('login.html');
+      }
+    })();
+  </script>
+</head>
+<body>
+
+  <!-- Top Emergency & Info Banner -->
+  <div class="top-notice-bar py-1">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-3">
+        <span><i class="fa-solid fa-truck-medical text-danger me-1"></i> 24/7 Emergency: <strong>+1 (800) 999-CARE</strong></span>
+        <span class="d-none d-md-inline text-muted">|</span>
+        <span class="d-none d-md-inline"><i class="fa-regular fa-clock text-info me-1"></i> OPD Hours: 08:00 AM - 08:00 PM</span>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <span id="backendStatusBadge" class="badge bg-success-subtle text-success border border-success-subtle">
+          <i class="fa-solid fa-circle-check me-1"></i> Checking System Connectivity...
+        </span>
+        <button class="btn btn-link btn-sm text-light p-0 text-decoration-none" onclick="HMSApp.resetAllDemoData()" title="Reset data to factory defaults">
+          <i class="fa-solid fa-rotate-left me-1"></i> Reset Data
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Navigation Bar -->
+  <nav class="navbar navbar-expand-lg app-navbar">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center gap-2 nav-switch" href="#" data-tab="home">
+        <div class="navbar-brand-badge">
+          <i class="fa-solid fa-hospital"></i>
+        </div>
+        <div>
+          <h1 class="brand-title">ApexCare</h1>
+          <span class="brand-subtitle">Hospital Management</span>
+        </div>
+      </a>
+
+      <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarMain">
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-1">
+          <li class="nav-item">
+            <a class="nav-link active nav-switch" href="#" data-tab="home">
+              <i class="fa-solid fa-house-chimney me-1"></i> Home
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-switch" href="#" data-tab="patient-portal">
+              <i class="fa-solid fa-user-injured me-1"></i> Patient Portal
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-switch" href="#" data-tab="doctor-portal">
+              <i class="fa-solid fa-user-doctor me-1"></i> Doctor Portal
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link nav-switch" href="#" data-tab="admin-portal">
+              <i class="fa-solid fa-shield-halved me-1"></i> Admin Portal
+            </a>
+          </li>
+        </ul>
+
+        <!-- User profile display & Actions -->
+        <div class="d-flex align-items-center gap-2">
+          <a href="login.html" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold d-none d-md-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="fa-solid fa-right-to-bracket me-1"></i> Sign In
+          </a>
+          <a href="register.html" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold d-none d-md-inline-flex align-items-center gap-1 shadow-sm">
+            <i class="fa-solid fa-user-plus me-1"></i> Register
+          </a>
+          <button class="btn btn-primary btn-sm px-3 shadow-sm rounded-pill" onclick="HMSApp.openBookModal()">
+            <i class="fa-regular fa-calendar-plus me-1"></i> Book Appointment
+          </button>
+          
+          <div class="dropdown">
+            <button class="btn btn-light btn-sm d-flex align-items-center gap-2 border rounded-pill px-3 py-1 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <div id="navUserAvatar" class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px;">A</div>
+              <div class="text-start d-none d-sm-block">
+                <div id="currentUserDisplay" class="fw-bold small lh-1 text-dark">Chief Administrator</div>
+                <span id="currentUserRolePill" class="badge bg-danger text-uppercase" style="font-size: 0.65rem;">ADMIN</span>
+              </div>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2">
+              <li class="dropdown-header text-uppercase small fw-bold">Active User & Quick Switch</li>
+              <li><button class="dropdown-item py-2" onclick="HMSApp.quickLogin('admin', 'admin123')"><i class="fa-solid fa-shield me-2 text-danger"></i> Admin (Chief Administrator)</button></li>
+              <li><button class="dropdown-item py-2" onclick="HMSApp.quickLogin('dr.sarah', 'doctor123')"><i class="fa-solid fa-user-doctor me-2 text-success"></i> Doctor (Dr. Sarah - Cardiology)</button></li>
+              <li><button class="dropdown-item py-2" onclick="HMSApp.quickLogin('dr.chen', 'doctor123')"><i class="fa-solid fa-user-doctor me-2 text-success"></i> Doctor (Dr. Chen - Neurology)</button></li>
+              <li><button class="dropdown-item py-2" onclick="HMSApp.quickLogin('john.doe', 'patient123')"><i class="fa-solid fa-user me-2 text-primary"></i> Patient (John Doe)</button></li>
+              <li><button class="dropdown-item py-2" onclick="HMSApp.quickLogin('jane.smith', 'patient123')"><i class="fa-solid fa-user me-2 text-primary"></i> Patient (Jane Smith)</button></li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <a class="dropdown-item py-2 text-primary fw-semibold" href="login.html">
+                  <i class="fa-solid fa-right-to-bracket me-2"></i> Dedicated Login Page
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item py-2 text-success fw-semibold" href="register.html">
+                  <i class="fa-solid fa-user-plus me-2"></i> Dedicated Registration Page
+                </a>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <button class="dropdown-item py-2 text-danger" onclick="HMSApp.logout()">
+                  <i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Sign Out / Switch Account
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Quick Demo Role Switcher Toolbar -->
+  <div class="bg-white border-bottom py-2">
+    <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+      <div class="d-flex align-items-center gap-2">
+        <span class="small fw-bold text-muted text-uppercase" style="letter-spacing: 0.05em;">
+          <i class="fa-solid fa-bolt text-warning me-1"></i> Quick Demo Roles:
+        </span>
+        <div class="d-flex flex-wrap gap-1">
+          <span class="demo-chip" data-user="admin" onclick="HMSApp.quickLogin('admin', 'admin123')">
+            <i class="fa-solid fa-shield text-danger"></i> Admin
+          </span>
+          <span class="demo-chip" data-user="dr.sarah" onclick="HMSApp.quickLogin('dr.sarah', 'doctor123')">
+            <i class="fa-solid fa-heart-pulse text-success"></i> Dr. Sarah (Cardio)
+          </span>
+          <span class="demo-chip" data-user="dr.chen" onclick="HMSApp.quickLogin('dr.chen', 'doctor123')">
+            <i class="fa-solid fa-brain text-success"></i> Dr. Chen (Neuro)
+          </span>
+          <span class="demo-chip" data-user="john.doe" onclick="HMSApp.quickLogin('john.doe', 'patient123')">
+            <i class="fa-solid fa-user text-primary"></i> Patient (John)
+          </span>
+          <span class="demo-chip" data-user="jane.smith" onclick="HMSApp.quickLogin('jane.smith', 'patient123')">
+            <i class="fa-solid fa-user text-primary"></i> Patient (Jane)
+          </span>
+        </div>
+      </div>
+      <div class="small text-muted">
+        <i class="fa-solid fa-circle-info text-info me-1"></i> Click any role to test full functionality instantly!
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- VIEW 1: HOME PAGE -->
+  <!-- ========================================================================= -->
+  <div id="view-home" class="app-page-view">
+    <!-- Hero Banner -->
+    <header class="hero-section">
+      <div class="hero-glow-1"></div>
+      <div class="hero-glow-2"></div>
+      <div class="container position-relative">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-7">
+            <div class="badge-pill-soft mb-3">
+              <i class="fa-solid fa-stethoscope"></i> Multi-Specialty Clinical Excellence
+            </div>
+            <h1 class="hero-title mb-3">
+              Smart Hospital Care, <br><span class="text-gradient">Simplified & Connected.</span>
+            </h1>
+            <p class="hero-lead mb-4">
+              Comprehensive web platform unifying patients, doctors, appointments, medical prescriptions, and instant billing records with state-of-the-art precision.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+              <button class="btn btn-primary btn-lg px-4" onclick="HMSApp.openBookModal()">
+                <i class="fa-regular fa-calendar-check me-2"></i> Book Appointment Now
+              </button>
+              <button class="btn btn-outline-custom btn-lg px-4 nav-switch" data-tab="patient-portal">
+                <i class="fa-solid fa-hospital-user me-2"></i> Access Patient Portal
+              </button>
+              <button class="btn btn-teal btn-lg px-4 nav-switch" data-tab="admin-portal">
+                <i class="fa-solid fa-chart-line me-2"></i> Admin Analytics
+              </button>
+            </div>
+
+            <!-- Highlights -->
+            <div class="row g-3 mt-4 pt-2">
+              <div class="col-sm-4">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="fa-solid fa-check-circle text-success fs-5"></i>
+                  <span class="small fw-bold text-dark">Verified Doctors</span>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="fa-solid fa-check-circle text-success fs-5"></i>
+                  <span class="small fw-bold text-dark">Instant Digital Rx</span>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="fa-solid fa-check-circle text-success fs-5"></i>
+                  <span class="small fw-bold text-dark">Transparent Billing</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="card-premium p-4 shadow-lg border-0 position-relative">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0 text-dark">
+                  <i class="fa-regular fa-clock text-primary me-2"></i> Quick Consultation
+                </h5>
+                <span class="badge bg-success-subtle text-success">Same Day Available</span>
+              </div>
+              <p class="text-muted small mb-4">
+                Choose a specialist and lock in your consultation in less than 60 seconds.
+              </p>
+
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">Select Department</label>
+                <select class="form-select" id="quickDeptSelect" onchange="document.getElementById('homeDeptFilter').value = this.value; HMSApp.renderHomeDoctors('', this.value);">
+                  <option value="ALL">All Departments (Cardiology, Neurology, etc.)</option>
+                  <option value="Cardiology">Cardiology (Heart & Vascular)</option>
+                  <option value="Neurology">Neurology (Brain & Spine)</option>
+                  <option value="Pediatrics">Pediatrics (Child Healthcare)</option>
+                  <option value="Orthopedics">Orthopedics (Joints & Bones)</option>
+                </select>
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label small fw-bold text-muted">Available Doctors</label>
+                <div class="p-3 bg-light rounded-3 d-flex align-items-center justify-content-between">
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="doctor-avatar-circle" style="width: 44px; height: 44px; font-size: 1.1rem; margin-right: 0;">S</div>
+                    <div>
+                      <div class="fw-bold text-dark small">Dr. Sarah Johnson</div>
+                      <small class="text-muted">Cardiology • 09:00 AM - 04:00 PM</small>
+                    </div>
+                  </div>
+                  <span class="fw-bold text-primary">$150.00</span>
+                </div>
+              </div>
+
+              <button class="btn btn-primary w-100 py-2 fw-bold" onclick="HMSApp.openBookModal(1)">
+                <i class="fa-regular fa-calendar-check me-2"></i> Book with Dr. Sarah
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Key Modules Overview (as per Document Specification) -->
+    <section class="py-5 bg-white border-bottom">
+      <div class="container">
+        <div class="text-center max-w-xl mx-auto mb-5">
+          <span class="badge bg-primary-subtle text-primary fw-bold px-3 py-1 rounded-pill mb-2">System Architecture</span>
+          <h2 class="fw-bold">6 Integrated Core Modules</h2>
+          <p class="text-muted">Seamlessly automating hospital activities across medical, operational, and financial touchpoints.</p>
+        </div>
+
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="card-premium p-4 h-100">
+              <div class="stat-icon-wrapper bg-primary-subtle text-primary mb-3">
+                <i class="fa-solid fa-hospital-user"></i>
+              </div>
+              <h5 class="fw-bold mb-2">1. Patients Module</h5>
+              <p class="text-muted small mb-0">Profile management, doctor directory search, appointment booking, prescription records, and complete billing access.</p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card-premium p-4 h-100">
+              <div class="stat-icon-wrapper bg-success-subtle text-success mb-3">
+                <i class="fa-solid fa-user-doctor"></i>
+              </div>
+              <h5 class="fw-bold mb-2">2. Doctors Module</h5>
+              <p class="text-muted small mb-0">Appointment management, patient medical history review, consultation details, and instant digital prescription generation.</p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card-premium p-4 h-100">
+              <div class="stat-icon-wrapper bg-info-subtle text-info mb-3">
+                <i class="fa-regular fa-calendar-check"></i>
+              </div>
+              <h5 class="fw-bold mb-2">3. Appointments Module</h5>
+              <p class="text-muted small mb-0">Book, schedule, track status (Pending, Approved, Completed, Cancelled), and manage time slots dynamically.</p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card-premium p-4 h-100">
+              <div class="stat-icon-wrapper bg-warning-subtle text-warning mb-3">
+                <i class="fa-solid fa-file-prescription"></i>
+              </div>
+              <h5 class="fw-bold mb-2">4. Prescriptions Module</h5>
+              <p class="text-muted small mb-0">Doctor-issued medicine regimens, dosage, frequency, diagnosis code, special instructions, and printable Rx cards.</p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card-premium p-4 h-100">
+              <div class="stat-icon-wrapper bg-danger-subtle text-danger mb-3">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+              </div>
+              <h5 class="fw-bold mb-2">5. Billing Module</h5>
+              <p class="text-muted small mb-0">Automated invoice generation, consultation fee calculation, additional service charges, and online payment processing.</p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card-premium p-4 h-100">
+              <div class="stat-icon-wrapper bg-secondary-subtle text-secondary mb-3">
+                <i class="fa-solid fa-chart-pie"></i>
+              </div>
+              <h5 class="fw-bold mb-2">6. Administration Module</h5>
+              <p class="text-muted small mb-0">Comprehensive management of patients, doctors, appointments, revenue analytics, and system-wide operational reports.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Medical Specialists Directory -->
+    <section class="py-5" id="doctorsSection">
+      <div class="container">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+          <div>
+            <h2 class="fw-bold mb-1">Our Medical Specialists</h2>
+            <p class="text-muted mb-0">Consult with highly qualified, board-certified medical doctors.</p>
+          </div>
+          <div class="d-flex gap-2 flex-wrap">
+            <div class="input-group" style="max-width: 280px;">
+              <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+              <input type="text" id="homeDoctorSearch" class="form-control border-start-0" placeholder="Search doctor or specialty...">
+            </div>
+            <select id="homeDeptFilter" class="form-select" style="max-width: 200px;">
+              <option value="ALL">All Departments</option>
+              <option value="Cardiology">Cardiology</option>
+              <option value="Neurology">Neurology</option>
+              <option value="Pediatrics">Pediatrics</option>
+              <option value="Orthopedics">Orthopedics</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Doctors Grid (rendered dynamically) -->
+        <div class="row g-4" id="homeDoctorsGrid"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- VIEW 2: PATIENT PORTAL -->
+  <!-- ========================================================================= -->
+  <div id="view-patient-portal" class="app-page-view d-none">
+    <div class="container py-4">
+      <!-- Portal Header Banner -->
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4 pb-3 border-bottom">
+        <div>
+          <span class="badge bg-primary-subtle text-primary mb-1">Patient Dashboard</span>
+          <h2 class="fw-bold mb-0">My Healthcare Portal</h2>
+          <p class="text-muted mb-0">Manage appointments, view medical prescriptions, and pay hospital invoices.</p>
+        </div>
+        <button class="btn btn-primary shadow-sm" onclick="HMSApp.openBookModal()">
+          <i class="fa-regular fa-calendar-plus me-1"></i> Book New Appointment
+        </button>
+      </div>
+
+      <div class="row g-4">
+        <!-- Patient Profile Card -->
+        <div class="col-lg-4">
+          <div class="card-premium p-4 mb-4">
+            <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+              <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold fs-4" style="width: 60px; height: 60px;">
+                <i class="fa-solid fa-user"></i>
+              </div>
+              <div>
+                <h5 class="fw-bold mb-0 text-dark" id="patientCardName">John Doe</h5>
+                <small class="text-muted" id="patientCardEmail">john.doe@email.com</small>
+              </div>
+            </div>
+
+            <div class="d-flex flex-column gap-2 small">
+              <div class="d-flex justify-content-between py-1 border-bottom">
+                <span class="text-muted"><i class="fa-solid fa-phone me-1"></i> Phone:</span>
+                <span class="fw-semibold text-dark" id="patientCardPhone">+1-555-0201</span>
+              </div>
+              <div class="d-flex justify-content-between py-1 border-bottom">
+                <span class="text-muted"><i class="fa-solid fa-droplet text-danger me-1"></i> Blood Group:</span>
+                <span class="badge bg-danger-subtle text-danger" id="patientCardBlood">O+</span>
+              </div>
+              <div class="d-flex justify-content-between py-1 border-bottom">
+                <span class="text-muted"><i class="fa-regular fa-calendar me-1"></i> Date of Birth:</span>
+                <span class="fw-semibold text-dark" id="patientCardDob">1988-05-14</span>
+              </div>
+              <div class="d-flex justify-content-between py-1 border-bottom">
+                <span class="text-muted"><i class="fa-solid fa-venus-mars me-1"></i> Gender:</span>
+                <span class="fw-semibold text-dark" id="patientCardGender">Male</span>
+              </div>
+              <div class="py-1 border-bottom">
+                <span class="text-muted d-block mb-1"><i class="fa-solid fa-person-circle-exclamation me-1"></i> Emergency Contact:</span>
+                <span class="fw-semibold text-dark" id="patientCardEmergency">+1-555-9988 (Brother: Mark Doe)</span>
+              </div>
+              <div class="py-1">
+                <span class="text-muted d-block mb-1"><i class="fa-solid fa-notes-medical me-1"></i> Medical History:</span>
+                <span class="text-secondary" id="patientCardHistory">Mild hypertension, seasonal allergies.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Appointments, Prescriptions & Bills Container -->
+        <div class="col-lg-8">
+          <!-- Nav Tabs for Patient Portal -->
+          <ul class="nav nav-pills mb-4 nav-pills-custom" id="patientPortalTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-patient-appointments" type="button">
+                <i class="fa-regular fa-calendar-check me-1"></i> My Appointments
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-patient-prescriptions" type="button">
+                <i class="fa-solid fa-file-prescription me-1"></i> Prescriptions
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-patient-bills" type="button">
+                <i class="fa-solid fa-file-invoice-dollar me-1"></i> Invoices & Billing
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content" id="patientPortalTabContent">
+            <!-- Tab 1: Appointments -->
+            <div class="tab-pane fade show active" id="tab-patient-appointments">
+              <div class="card-premium overflow-hidden">
+                <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+                  <h6 class="fw-bold mb-0 text-dark"><i class="fa-regular fa-calendar text-primary me-2"></i> Booked Consultations</h6>
+                  <small class="text-muted">Live Status Tracking</small>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-custom">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Doctor</th>
+                        <th>Schedule</th>
+                        <th>Status</th>
+                        <th>Reason</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="patientAppointmentsTableBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 2: Prescriptions -->
+            <div class="tab-pane fade" id="tab-patient-prescriptions">
+              <div class="card-premium p-4">
+                <h6 class="fw-bold mb-3 text-dark"><i class="fa-solid fa-file-prescription text-primary me-2"></i> Doctor-Issued Digital Prescriptions</h6>
+                <div id="patientPrescriptionsList"></div>
+              </div>
+            </div>
+
+            <!-- Tab 3: Bills -->
+            <div class="tab-pane fade" id="tab-patient-bills">
+              <div class="card-premium overflow-hidden">
+                <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+                  <h6 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-receipt text-primary me-2"></i> Consultation Bills & Receipts</h6>
+                  <span class="badge bg-info-subtle text-info">Instant Online Payment</span>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-custom">
+                    <thead>
+                      <tr>
+                        <th>Invoice</th>
+                        <th>Doctor / Date</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="patientBillsTableBody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- VIEW 3: DOCTOR PORTAL -->
+  <!-- ========================================================================= -->
+  <div id="view-doctor-portal" class="app-page-view d-none">
+    <div class="container py-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4 pb-3 border-bottom">
+        <div>
+          <span class="badge bg-success-subtle text-success mb-1">Doctor Portal</span>
+          <h2 class="fw-bold mb-0">Doctor's Consultation Console</h2>
+          <p class="text-muted mb-0">Manage daily appointment queue, review patient history, and issue digital prescriptions.</p>
+        </div>
+        <div class="d-flex gap-2">
+          <span class="badge bg-light text-dark border p-2">
+            <i class="fa-regular fa-clock text-success me-1"></i> <span id="doctorCardHours">09:00 AM - 04:00 PM</span>
+          </span>
+          <span class="badge bg-light text-dark border p-2">
+            <i class="fa-solid fa-door-open text-primary me-1"></i> <span id="doctorCardRoom">Opd-301</span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Doctor Stats Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-4">
+          <div class="card-metric border-start border-primary border-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="text-muted small fw-bold text-uppercase">Assigned Consultations</span>
+                <h3 class="fw-bold text-dark mb-0" id="docStatTotal">0</h3>
+              </div>
+              <div class="stat-icon-wrapper bg-primary-subtle text-primary">
+                <i class="fa-solid fa-calendar-check"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card-metric border-start border-warning border-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="text-muted small fw-bold text-uppercase">Pending Approval</span>
+                <h3 class="fw-bold text-dark mb-0" id="docStatPending">0</h3>
+              </div>
+              <div class="stat-icon-wrapper bg-warning-subtle text-warning">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card-metric border-start border-success border-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <span class="text-muted small fw-bold text-uppercase">Completed & Prescribed</span>
+                <h3 class="fw-bold text-dark mb-0" id="docStatCompleted">0</h3>
+              </div>
+              <div class="stat-icon-wrapper bg-success-subtle text-success">
+                <i class="fa-solid fa-circle-check"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Doctor Profile Bar -->
+      <div class="card-premium p-3 mb-4 bg-light">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div class="d-flex align-items-center gap-3">
+            <div class="doctor-avatar-circle" style="width: 50px; height: 50px; font-size: 1.3rem; margin-right: 0;">Dr</div>
+            <div>
+              <h5 class="fw-bold mb-0 text-dark" id="doctorCardName">Dr. Sarah Johnson</h5>
+              <small class="text-muted"><span id="doctorCardDept">Cardiology</span> • <span id="doctorCardQual">MD, Harvard</span> • <span id="doctorCardExp">12 Yrs</span></small>
+            </div>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="HMSApp.quickLogin('dr.sarah', 'doctor123')">Switch to Dr. Sarah</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="HMSApp.quickLogin('dr.chen', 'doctor123')">Switch to Dr. Chen</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Doctor Appointment Management Table -->
+      <div class="card-premium overflow-hidden">
+        <div class="p-3 bg-white border-bottom d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-list-check text-primary me-2"></i> Patient Consultation Queue</h5>
+          <span class="small text-muted">Click 'Write Rx' on approved appointments to issue medicines</span>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-custom">
+            <thead>
+              <tr>
+                <th>App ID</th>
+                <th>Patient Details</th>
+                <th>Schedule</th>
+                <th>Status</th>
+                <th>Notes / Findings</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="doctorAppointmentsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- VIEW 4: ADMIN PORTAL -->
+  <!-- ========================================================================= -->
+  <div id="view-admin-portal" class="app-page-view d-none">
+    <div class="container py-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4 pb-3 border-bottom">
+        <div>
+          <span class="badge bg-danger-subtle text-danger mb-1">Administrative Center</span>
+          <h2 class="fw-bold mb-0">Hospital Executive Dashboard</h2>
+          <p class="text-muted mb-0">System-wide operational tracking, revenue figures, doctor rosters, and patient records.</p>
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addDoctorModal">
+            <i class="fa-solid fa-user-plus me-1"></i> Add Specialist Doctor
+          </button>
+          <button class="btn btn-outline-danger btn-sm" onclick="HMSApp.resetAllDemoData()">
+            <i class="fa-solid fa-arrows-rotate me-1"></i> Reset Demo Database
+          </button>
+        </div>
+      </div>
+
+      <!-- KPI Metric Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-2 col-sm-4 col-6">
+          <div class="card-metric">
+            <span class="text-muted small fw-bold text-uppercase d-block mb-1">Total Patients</span>
+            <h4 class="fw-bold text-dark mb-0" id="adminStatPatients">0</h4>
+          </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6">
+          <div class="card-metric">
+            <span class="text-muted small fw-bold text-uppercase d-block mb-1">Active Doctors</span>
+            <h4 class="fw-bold text-dark mb-0" id="adminStatDoctors">0</h4>
+          </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6">
+          <div class="card-metric">
+            <span class="text-muted small fw-bold text-uppercase d-block mb-1">Appointments</span>
+            <h4 class="fw-bold text-dark mb-0" id="adminStatAppointments">0</h4>
+          </div>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6">
+          <div class="card-metric">
+            <span class="text-muted small fw-bold text-uppercase d-block mb-1">Completed</span>
+            <h4 class="fw-bold text-success mb-0" id="adminStatCompleted">0</h4>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="card-metric border-start border-success border-4">
+            <span class="text-muted small fw-bold text-uppercase d-block mb-1">Collected Revenue</span>
+            <h4 class="fw-bold text-success mb-0" id="adminStatRevenue">$0.00</h4>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-6 col-12">
+          <div class="card-metric border-start border-warning border-4">
+            <span class="text-muted small fw-bold text-uppercase d-block mb-1">Pending Invoices</span>
+            <h4 class="fw-bold text-danger mb-0" id="adminStatPendingRev">$0.00</h4>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analytics Row -->
+      <div class="row g-4 mb-4">
+        <div class="col-lg-4">
+          <div class="card-premium p-4 h-100">
+            <h5 class="fw-bold text-dark mb-3"><i class="fa-solid fa-chart-pie text-primary me-2"></i> Department Workload</h5>
+            <div style="height: 240px; position: relative;">
+              <canvas id="adminDeptChart"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-8">
+          <div class="card-premium p-4 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <h5 class="fw-bold text-dark mb-0"><i class="fa-solid fa-user-doctor text-primary me-2"></i> Medical Specialist Roster</h5>
+              <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addDoctorModal">
+                <i class="fa-solid fa-plus me-1"></i> Add Doctor
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-custom">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Doctor Name</th>
+                    <th>Department</th>
+                    <th>Specialization</th>
+                    <th>Fee</th>
+                    <th>Schedule</th>
+                  </tr>
+                </thead>
+                <tbody id="adminDoctorsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Tabs: Patients, Master Appointments, Billing Records -->
+      <div class="card-premium">
+        <div class="p-3 bg-light border-bottom">
+          <ul class="nav nav-pills nav-pills-custom" id="adminTabNav" role="tablist">
+            <li class="nav-item">
+              <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#admin-tab-appointments">
+                <i class="fa-regular fa-calendar-check me-1"></i> All Appointments
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="pill" data-bs-target="#admin-tab-patients">
+                <i class="fa-solid fa-users me-1"></i> Patient Directory
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link" data-bs-toggle="pill" data-bs-target="#admin-tab-bills">
+                <i class="fa-solid fa-file-invoice-dollar me-1"></i> Hospital Financial Records
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <div class="tab-content p-3">
+          <div class="tab-pane fade show active" id="admin-tab-appointments">
+            <div class="table-responsive">
+              <table class="table table-custom">
+                <thead>
+                  <tr>
+                    <th>App ID</th>
+                    <th>Patient Name</th>
+                    <th>Doctor</th>
+                    <th>Schedule</th>
+                    <th>Status</th>
+                    <th>Quick Override</th>
+                  </tr>
+                </thead>
+                <tbody id="adminAppointmentsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="tab-pane fade" id="admin-tab-patients">
+            <div class="table-responsive">
+              <table class="table table-custom">
+                <thead>
+                  <tr>
+                    <th>Patient ID</th>
+                    <th>Full Name</th>
+                    <th>Gender/Blood</th>
+                    <th>Contact</th>
+                    <th>Address</th>
+                    <th>Medical History</th>
+                  </tr>
+                </thead>
+                <tbody id="adminPatientsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="tab-pane fade" id="admin-tab-bills">
+            <div class="table-responsive">
+              <table class="table table-custom">
+                <thead>
+                  <tr>
+                    <th>Invoice ID</th>
+                    <th>Patient</th>
+                    <th>Doctor</th>
+                    <th>Total ($)</th>
+                    <th>Status</th>
+                    <th>Payment Method</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody id="adminBillsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODALS -->
+  <!-- ========================================================================= -->
+
+  <!-- 1. Book Appointment Modal -->
+  <div class="modal fade" id="bookAppointmentModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold"><i class="fa-regular fa-calendar-plus me-2"></i> Book Doctor Consultation</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="bookAppointmentForm">
+          <div class="modal-body p-4">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Select Specialist Doctor *</label>
+              <select id="bookDoctorSelect" class="form-select" required></select>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Appointment Date *</label>
+                <input type="date" id="bookDateInput" class="form-control" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Preferred Time Slot *</label>
+                <select id="bookTimeSelect" class="form-select" required>
+                  <option value="09:00 AM">09:00 AM</option>
+                  <option value="10:00 AM">10:00 AM</option>
+                  <option value="11:30 AM">11:30 AM</option>
+                  <option value="02:00 PM">02:00 PM</option>
+                  <option value="03:30 PM">03:30 PM</option>
+                  <option value="04:30 PM">04:30 PM</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Reason for Visit / Symptoms</label>
+              <textarea id="bookReasonInput" class="form-control" rows="2" placeholder="Describe symptoms or routine checkup reason..."></textarea>
+            </div>
+
+            <div class="p-3 bg-light rounded-3 d-flex justify-content-between align-items-center">
+              <div>
+                <span class="text-muted small d-block">Consultation Fee</span>
+                <span class="fw-bold text-dark fs-5" id="bookingFeeDisplay">$0.00</span>
+              </div>
+              <span class="badge bg-success-subtle text-success">Automated Billing Generated</span>
+            </div>
+          </div>
+          <div class="modal-footer border-top-0 pt-0">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary px-4 fw-semibold">Confirm Appointment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Write / Issue Prescription Modal (Doctor) -->
+  <div class="modal fade" id="issuePrescriptionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title fw-bold"><i class="fa-solid fa-file-prescription me-2"></i> Issue Digital Medical Prescription</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="issuePrescriptionForm">
+          <input type="hidden" id="issuePrescAppointmentId">
+          <div class="modal-body p-4">
+            <div class="p-3 bg-light rounded-3 mb-3 d-flex justify-content-between align-items-center">
+              <div>
+                <span class="text-muted small">Patient Name:</span>
+                <div class="fw-bold text-dark" id="issuePrescPatientName">John Doe</div>
+              </div>
+              <div>
+                <span class="text-muted small">Reported Reason:</span>
+                <div class="fw-semibold text-secondary" id="issuePrescReason">Headache</div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Clinical Diagnosis & Findings *</label>
+              <input type="text" id="issuePrescDiagnosis" class="form-control" placeholder="e.g., Acute Sinusitis / Chronic Migraine / Hypertension Stage 1" required>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Prescribed Medicines & Dosage Schedule *</label>
+              <textarea id="issuePrescMedicines" class="form-control font-monospace" rows="4" placeholder="1. Medicine Name 500mg - 1 tablet twice daily after meals (5 days)
+2. Syrup 10ml - At night before bedtime" required></textarea>
+              <small class="text-muted">Enter medication name, strength, dosage, frequency, and duration.</small>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Special Dietary & Lifestyle Instructions</label>
+              <textarea id="issuePrescInstructions" class="form-control" rows="2" placeholder="e.g., Drink plenty of warm water. Avoid heavy physical lifting for 1 week. Follow-up in 10 days."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer border-top-0 pt-0">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-success px-4 fw-semibold">
+              <i class="fa-solid fa-check-circle me-1"></i> Issue Rx & Complete Visit
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Official Printable Prescription View Modal -->
+  <div class="modal fade" id="viewPrescriptionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-light">
+          <h5 class="modal-title fw-bold text-dark"><i class="fa-solid fa-print me-2 text-primary"></i> Digital Medical Prescription</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4" id="printablePrescriptionContent">
+          <div class="prescription-paper position-relative">
+            <div class="prescription-watermark">APEXCARE HOSPITAL</div>
+
+            <!-- Clinic Header -->
+            <div class="d-flex justify-content-between align-items-center pb-3 border-bottom mb-3">
+              <div class="d-flex align-items-center gap-2">
+                <div class="navbar-brand-badge" style="width: 38px; height: 38px; font-size: 1.1rem;">
+                  <i class="fa-solid fa-hospital"></i>
+                </div>
+                <div>
+                  <h4 class="fw-bold mb-0 text-dark">ApexCare Hospital</h4>
+                  <small class="text-muted">Multi-Specialty Healthcare • Lic. #AC-88921</small>
+                </div>
+              </div>
+              <div class="text-end">
+                <h6 class="fw-bold mb-0 text-primary" id="rxModalDocName">Dr. Sarah Johnson</h6>
+                <small class="text-muted" id="rxModalDocDept">Cardiology Specialist</small>
+                <div class="small fw-semibold text-secondary" id="rxModalRxNumber">#RX-2026-0001</div>
+              </div>
+            </div>
+
+            <!-- Patient Info Bar -->
+            <div class="row g-2 p-2 bg-light rounded-2 mb-3 small">
+              <div class="col-sm-6">
+                <span class="text-muted">Patient:</span> <strong id="rxModalPatName">Jane Smith</strong>
+              </div>
+              <div class="col-sm-3">
+                <span class="text-muted">Info:</span> <span id="rxModalPatAge">Female, A+</span>
+              </div>
+              <div class="col-sm-3 text-sm-end">
+                <span class="text-muted">Date:</span> <strong id="rxModalDate">2026-10-08</strong>
+              </div>
+            </div>
+
+            <!-- Diagnosis -->
+            <div class="mb-3">
+              <span class="text-muted small fw-bold text-uppercase d-block mb-1">Clinical Diagnosis</span>
+              <div class="p-2 border rounded-2 fw-semibold text-dark bg-white" id="rxModalDiagnosis">Chronic Migraine</div>
+            </div>
+
+            <!-- Rx Symbol & Medicines -->
+            <div class="mb-4">
+              <div class="rx-symbol mb-2">&#8478;</div>
+              <div class="p-3 bg-light rounded-2 font-monospace text-dark" id="rxModalMedicines" style="white-space: pre-line; line-height: 1.8;"></div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="mb-4">
+              <span class="text-muted small fw-bold text-uppercase d-block mb-1">Doctor's Advice & Instructions</span>
+              <div class="small text-secondary" id="rxModalInstructions">Follow medicine schedule accurately.</div>
+            </div>
+
+            <!-- Footer / Signature -->
+            <div class="d-flex justify-content-between align-items-end pt-4 border-top">
+              <div class="small text-muted">
+                Emergency Helpline: +1 (800) 999-CARE<br>
+                Valid across all authorized pharmacies.
+              </div>
+              <div class="text-center">
+                <div class="border-bottom pb-1 mb-1 fw-bold text-dark font-monospace" style="min-width: 150px;">Dr. Verified [Signed]</div>
+                <small class="text-muted">Registered Physician Signature</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer bg-light">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="HMSApp.printPrescription()">
+            <i class="fa-solid fa-print me-1"></i> Print / Save as PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Pay Bill Modal (Online Payment Simulation) -->
+  <div class="modal fade" id="payBillModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title fw-bold"><i class="fa-solid fa-credit-card me-2"></i> Pay Hospital Bill</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+          <input type="hidden" id="payBillId">
+          <div class="p-3 bg-light rounded-3 mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <span class="text-muted small">Patient:</span>
+              <span class="fw-bold text-dark" id="payBillPatientName">John Doe</span>
+            </div>
+            <div class="d-flex justify-content-between mb-1">
+              <span class="text-muted small">Consulting Doctor:</span>
+              <span class="fw-semibold text-dark" id="payBillDoctorName">Dr. Sarah Johnson</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted small">Details:</span>
+              <span class="small text-secondary" id="payBillBreakdown">Consultation Fee</span>
+            </div>
+            <hr class="my-2">
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="fw-bold text-dark">Total Due:</span>
+              <span class="fs-4 fw-bold text-primary" id="payBillAmount">$150.00</span>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Select Payment Gateway</label>
+            <select id="payMethodSelect" class="form-select">
+              <option value="Credit Card (Visa/Mastercard)">Credit / Debit Card</option>
+              <option value="UPI / Online QR">Instant UPI / QR Code</option>
+              <option value="Net Banking">Net Banking</option>
+              <option value="Cash at Counter">Cash Payment Counter</option>
+            </select>
+          </div>
+
+          <div class="p-2 border rounded-2 bg-light text-muted small d-flex align-items-center gap-2">
+            <i class="fa-solid fa-shield-halved text-success fs-5"></i>
+            <span>256-Bit SSL Encrypted Healthcare Payment Gateway. Instant receipt generated upon clearance.</span>
+          </div>
+        </div>
+        <div class="modal-footer border-top-0 pt-0">
+          <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success px-4 fw-bold" onclick="HMSApp.confirmPayment()">
+            <i class="fa-solid fa-lock me-1"></i> Pay Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Add Specialist Doctor Modal (Admin) -->
+  <div class="modal fade" id="addDoctorModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-dark text-white">
+          <h5 class="modal-title fw-bold"><i class="fa-solid fa-user-plus me-2 text-primary"></i> Register New Specialist Doctor</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="addDoctorForm">
+          <div class="modal-body p-4">
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Doctor Full Name *</label>
+              <input type="text" id="addDocName" class="form-control" placeholder="Dr. First Last" required>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Department *</label>
+                <select id="addDocDept" class="form-select" required>
+                  <option value="Cardiology">Cardiology</option>
+                  <option value="Neurology">Neurology</option>
+                  <option value="Pediatrics">Pediatrics</option>
+                  <option value="Orthopedics">Orthopedics</option>
+                  <option value="Dermatology">Dermatology</option>
+                  <option value="General Medicine">General Medicine</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Consultation Fee ($) *</label>
+                <input type="number" id="addDocFee" class="form-control" value="150" step="5" required>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold">Specialization Area</label>
+              <input type="text" id="addDocSpec" class="form-control" placeholder="e.g. Heart Rhythm & Pacemakers" required>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Qualification</label>
+                <input type="text" id="addDocQual" class="form-control" placeholder="MD, FACC" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Experience (Years)</label>
+                <input type="number" id="addDocExp" class="form-control" value="8" required>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Available Days</label>
+                <input type="text" id="addDocDays" class="form-control" value="Mon - Fri">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Timings</label>
+                <input type="text" id="addDocHours" class="form-control" value="09:00 AM - 04:00 PM">
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-top-0 pt-0">
+            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary px-4 fw-semibold">Save Doctor</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Custom Auth Modal (Login / Register) -->
+  <div class="modal fade" id="authModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header border-bottom-0 pb-0">
+          <ul class="nav nav-pills w-100 nav-pills-custom" role="tablist">
+            <li class="nav-item flex-fill text-center">
+              <button class="nav-link active w-100" data-bs-toggle="pill" data-bs-target="#tab-login">Login</button>
+            </li>
+            <li class="nav-item flex-fill text-center">
+              <button class="nav-link w-100" data-bs-toggle="pill" data-bs-target="#tab-register">New Patient Register</button>
+            </li>
+          </ul>
+        </div>
+        <div class="modal-body p-4">
+          <div class="tab-content">
+            <!-- Login Form -->
+            <div class="tab-pane fade show active" id="tab-login">
+              <form id="loginForm">
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Username</label>
+                  <input type="text" id="loginUsername" class="form-control" placeholder="e.g. admin or dr.sarah or john.doe" required>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label fw-semibold">Password</label>
+                  <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                </div>
+                <div class="p-2 mb-3 bg-light rounded small text-muted">
+                  Demo passwords: <code>admin123</code>, <code>doctor123</code>, <code>patient123</code>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Sign In</button>
+              </form>
+            </div>
+
+            <!-- Register Form -->
+            <div class="tab-pane fade" id="tab-register">
+              <form id="registerForm">
+                <div class="row g-2 mb-2">
+                  <div class="col-6">
+                    <label class="form-label small fw-semibold">Full Name *</label>
+                    <input type="text" id="regFullName" class="form-control form-control-sm" required>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small fw-semibold">Username *</label>
+                    <input type="text" id="regUsername" class="form-control form-control-sm" required>
+                  </div>
+                </div>
+
+                <div class="row g-2 mb-2">
+                  <div class="col-6">
+                    <label class="form-label small fw-semibold">Email *</label>
+                    <input type="email" id="regEmail" class="form-control form-control-sm" required>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label small fw-semibold">Password *</label>
+                    <input type="password" id="regPassword" class="form-control form-control-sm" required>
+                  </div>
+                </div>
+
+                <div class="row g-2 mb-2">
+                  <div class="col-4">
+                    <label class="form-label small fw-semibold">DOB</label>
+                    <input type="date" id="regDob" class="form-control form-control-sm" value="1995-01-01">
+                  </div>
+                  <div class="col-4">
+                    <label class="form-label small fw-semibold">Gender</label>
+                    <select id="regGender" class="form-select form-select-sm">
+                      <option>Male</option>
+                      <option>Female</option>
+                      <option>Other</option>
+                    </select>
+                  </div>
+                  <div class="col-4">
+                    <label class="form-label small fw-semibold">Blood Group</label>
+                    <select id="regBloodGroup" class="form-select form-select-sm">
+                      <option>O+</option><option>A+</option><option>B+</option><option>AB+</option>
+                      <option>O-</option><option>A-</option><option>B-</option><option>AB-</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label small fw-semibold">Phone Number</label>
+                  <input type="text" id="regPhone" class="form-control form-control-sm" placeholder="+1-555-0199">
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label small fw-semibold">Address</label>
+                  <input type="text" id="regAddress" class="form-control form-control-sm" placeholder="Street, City">
+                </div>
+
+                <div class="mb-2">
+                  <label class="form-label small fw-semibold">Emergency Contact</label>
+                  <input type="text" id="regEmergencyContact" class="form-control form-control-sm" placeholder="Name & Phone">
+                </div>
+
+                <div class="mb-3">
+                  <label class="form-label small fw-semibold">Medical History</label>
+                  <textarea id="regMedicalHistory" class="form-control form-control-sm" rows="2" placeholder="Allergies, chronic conditions..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Create Patient Account</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications Container -->
+  <div id="appToastContainer" class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080;"></div>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white pt-5 pb-4 mt-5">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-md-4">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <div class="navbar-brand-badge" style="width: 36px; height: 36px; font-size: 1.1rem;">
+              <i class="fa-solid fa-hospital"></i>
+            </div>
+            <h5 class="fw-bold mb-0 text-white">ApexCare Hospital</h5>
+          </div>
+          <p class="text-secondary small">
+            State-of-the-art web-based hospital management system automating clinical scheduling, patient records, electronic prescriptions, and hospital financial records.
+          </p>
+        </div>
+        <div class="col-md-2 col-6">
+          <h6 class="text-uppercase fw-bold text-light small mb-3">Quick Navigation</h6>
+          <ul class="list-unstyled small text-secondary">
+            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none nav-switch" data-tab="home">Home</a></li>
+            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none nav-switch" data-tab="patient-portal">Patient Portal</a></li>
+            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none nav-switch" data-tab="doctor-portal">Doctor Portal</a></li>
+            <li class="mb-2"><a href="#" class="text-secondary text-decoration-none nav-switch" data-tab="admin-portal">Admin Console</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3 col-6">
+          <h6 class="text-uppercase fw-bold text-light small mb-3">Key Modules</h6>
+          <ul class="list-unstyled small text-secondary">
+            <li class="mb-2">Doctor Consultations</li>
+            <li class="mb-2">Appointment Scheduling</li>
+            <li class="mb-2">Medical Prescriptions</li>
+            <li class="mb-2">Automated Billing & Invoices</li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h6 class="text-uppercase fw-bold text-light small mb-3">Emergency & Contact</h6>
+          <p class="small text-secondary mb-1"><i class="fa-solid fa-phone text-primary me-2"></i> 24/7 Helpline: +1 (800) 999-CARE</p>
+          <p class="small text-secondary mb-1"><i class="fa-solid fa-envelope text-primary me-2"></i> contact@apexcare-hospital.com</p>
+          <p class="small text-secondary"><i class="fa-solid fa-location-dot text-primary me-2"></i> 500 Healthcare Blvd, Metro Medical Center</p>
+        </div>
+      </div>
+      <hr class="border-secondary my-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 small text-secondary">
+        <div>&copy; 2026 ApexCare Hospital Management System. All rights reserved.</div>
+        <div>Engineered with HTML5, CSS3, JavaScript & Bootstrap. Zero Maven required.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5.3 Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Application Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

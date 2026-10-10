@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApexCare - Login & Registration Portal</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Bootstrap 5.3 CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    :root {
+      --auth-primary: #0284c7;
+      --auth-secondary: #0d9488;
+      --auth-dark: #0f172a;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at 10% 20%, rgba(2, 132, 199, 0.08) 0%, transparent 40%),
+                  radial-gradient(circle at 90% 80%, rgba(13, 148, 136, 0.08) 0%, transparent 40%),
+                  linear-gradient(135deg, #f8fafc 0%, #e0f2fe 50%, #f0fdfa 100%);
+      display: flex;
+      flex-direction: column;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .auth-nav {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+    }
+
+    .auth-main-card {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(226, 232, 240, 0.9);
+      border-radius: 24px;
+      box-shadow: 0 25px 50px -12px rgba(2, 132, 199, 0.15), 0 10px 20px -5px rgba(0, 0, 0, 0.04);
+      overflow: hidden;
+    }
+
+    .auth-hero-banner {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 40%, #0d9488 100%);
+      color: #fff;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 3rem 2.5rem;
+    }
+
+    .auth-hero-banner::before {
+      content: '';
+      position: absolute;
+      top: -30%;
+      right: -30%;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .feature-point {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.92rem;
+    }
+
+    .feature-icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .auth-mode-pill-container {
+      background: #f1f5f9;
+      padding: 5px;
+      border-radius: 14px;
+      display: flex;
+      gap: 6px;
+    }
+
+    .auth-mode-pill {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 10px 16px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #64748b;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .auth-mode-pill.active {
+      background: #ffffff;
+      color: #0284c7;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .role-filter-tab {
+      display: flex;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      padding: 3px;
+      border-radius: 10px;
+      gap: 4px;
+    }
+
+    .role-filter-btn {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #64748b;
+      border-radius: 7px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .role-filter-btn.active {
+      background: #0284c7;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.25);
+    }
+
+    .input-group-custom {
+      border: 1.5px solid #e2e8f0;
+      border-radius: 11px;
+      overflow: hidden;
+      background: #fff;
+      transition: all 0.2s ease;
+    }
+
+    .input-group-custom:focus-within {
+      border-color: #0284c7;
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+    }
+
+    .input-group-custom .input-group-text {
+      background: #f8fafc;
+      border: none;
+      color: #64748b;
+      padding-left: 0.9rem;
+      padding-right: 0.7rem;
+    }
+
+    .input-group-custom .form-control,
+    .input-group-custom .form-select {
+      border: none;
+      padding: 0.7rem 0.85rem 0.7rem 0.3rem;
+      font-size: 0.92rem;
+      background: transparent;
+    }
+
+    .input-group-custom .form-control:focus,
+    .input-group-custom .form-select:focus {
+      box-shadow: none;
+    }
+
+    .demo-role-card {
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 11px;
+      background: #f8fafc;
+      padding: 0.6rem 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .demo-role-card:hover {
+      background: #e0f2fe;
+      border-color: #0284c7;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.1);
+    }
+
+    .btn-gradient-primary {
+      background: linear-gradient(135deg, #0284c7 0%, #0284c7 60%, #0d9488 100%);
+      color: #fff;
+      border: none;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      border-radius: 12px;
+      transition: all 0.25s ease;
+    }
+
+    .btn-gradient-primary:hover {
+      background: linear-gradient(135deg, #0369a1 0%, #0284c7 60%, #0f766e 100%);
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header class="auth-nav py-3">
+    <div class="container d-flex justify-content-between align-items-center">
+      <div class="d-flex align-items-center gap-2">
+        <div class="navbar-brand-badge" style="width: 40px; height: 40px; font-size: 1.25rem;">
+          <i class="fa-solid fa-hospital"></i>
+        </div>
+        <div>
+          <span class="brand-title fs-5 fw-bold text-dark d-block lh-1">ApexCare</span>
+          <span class="brand-subtitle text-muted" style="font-size: 0.7rem; font-weight: 600;">HOSPITAL SYSTEM</span>
+        </div>
+      </div>
+      
+      <div class="d-flex align-items-center gap-2">
+        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold" onclick="switchAuthMode('login')">
+          <i class="fa-solid fa-right-to-bracket me-1"></i> Sign In
+        </button>
+        <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 fw-bold shadow-sm" onclick="switchAuthMode('register')">
+          <i class="fa-solid fa-user-plus me-1"></i> Register New User
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container my-auto py-4">
+    <div class="row justify-content-center">
+      <div class="col-xl-11 col-lg-12">
+        <div class="auth-main-card">
+          <div class="row g-0">
+            
+            <!-- Left Showcase Column -->
+            <div class="col-lg-4 d-none d-lg-flex auth-hero-banner">
+              <div>
+                <span class="badge bg-white text-primary rounded-pill px-3 py-2 fw-bold text-uppercase mb-3" style="font-size: 0.72rem; letter-spacing: 0.05em;">
+                  <i class="fa-solid fa-shield-halved me-1"></i> ApexCare Hospital
+                </span>
+                <h3 class="fw-bold text-white mb-3">Healthcare Management Platform</h3>
+                <p class="text-white-50 mb-4" style="font-size: 0.92rem;">
+                  Sign in to your existing account or register a new patient profile to book appointments, view prescriptions, and access medical records.
+                </p>
+
+                <div class="feature-point">
+                  <div class="feature-icon-box"><i class="fa-solid fa-calendar-check text-white"></i></div>
+                  <div>
+                    <strong class="d-block text-white">1. Instant Appointments</strong>
+                    <span class="text-white-50 small">Schedule OPD visits with verified doctors</span>
+                  </div>
+                </div>
+
+                <div class="feature-point">
+                  <div class="feature-icon-box"><i class="fa-solid fa-notes-medical text-white"></i></div>
+                  <div>
+                    <strong class="d-block text-white">2. Electronic Medical Records</strong>
+                    <span class="text-white-50 small">Diagnosis and clinical consultation histories</span>
+                  </div>
+                </div>
+
+                <div class="feature-point">
+                  <div class="feature-icon-box"><i class="fa-solid fa-file-invoice-dollar text-white"></i></div>
+                  <div>
+                    <strong class="d-block text-white">3. Transparent Billing</strong>
+                    <span class="text-white-50 small">Itemized invoices and instant receipt generation</span>
+                  </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top border-white border-opacity-25">
+                  <div class="p-3 bg-white bg-opacity-10 rounded-3 small text-white-50">
+                    <strong class="text-white d-block mb-1"><i class="fa-solid fa-lightbulb text-warning me-1"></i> Quick Start:</strong>
+                    Use the <strong>Sign In</strong> tab to log in with 1-click demo accounts, or switch to <strong>Register</strong> to create your own account!
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-3 border-top border-white border-opacity-25 mt-4">
+                <div class="d-flex align-items-center justify-content-between text-white-50 small">
+                  <span><i class="fa-solid fa-lock me-1"></i> 256-Bit SSL Secured</span>
+                  <span><i class="fa-solid fa-circle-check me-1"></i> System Online</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Interactive Switcher for LOGIN & REGISTRATION -->
+            <div class="col-lg-8 p-4 p-sm-5 bg-white">
+              
+              <!-- Tab Mode Switcher -->
+              <div class="auth-mode-pill-container mb-4">
+                <button type="button" class="auth-mode-pill active" id="tab-btn-login" onclick="switchAuthMode('login')">
+                  <i class="fa-solid fa-right-to-bracket"></i> Sign In to Account
+                </button>
+                <button type="button" class="auth-mode-pill" id="tab-btn-register" onclick="switchAuthMode('register')">
+                  <i class="fa-solid fa-user-plus"></i> Register New User
+                </button>
+              </div>
+
+              <!-- Shared Alert Box -->
+              <div id="authAlertBox" class="alert d-none py-2 small mb-3 border"></div>
+
+              <!-- ============================================== -->
+              <!-- PANEL 1: SIGN IN FORM                          -->
+              <!-- ============================================== -->
+              <div id="panel-login">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h4 class="fw-bold text-dark mb-0">Welcome Back</h4>
+                    <p class="text-muted small mb-0">Sign in to access your ApexCare dashboard</p>
+                  </div>
+                  <!-- Role quick filter -->
+                  <div class="role-filter-tab" id="roleSelectorGroup">
+                    <button type="button" class="role-filter-btn active" data-role="any" onclick="selectRole('any')">All</button>
+                    <button type="button" class="role-filter-btn" data-role="patient" onclick="selectRole('patient')">Patient</button>
+                    <button type="button" class="role-filter-btn" data-role="doctor" onclick="selectRole('doctor')">Doctor</button>
+                    <button type="button" class="role-filter-btn" data-role="admin" onclick="selectRole('admin')">Admin</button>
+                  </div>
+                </div>
+
+                <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+                  <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted">Username or ID</label>
+                    <div class="input-group input-group-custom">
+                      <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                      <input type="text" id="loginUsernameInput" class="form-control" placeholder="Enter username (e.g. admin, dr.sarah, john.doe)" required autofocus>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                      <label class="form-label small fw-bold text-muted mb-0">Password</label>
+                      <a href="javascript:void(0)" class="small text-primary text-decoration-none" onclick="showDemoPasswordHelp()">Demo Passwords?</a>
+                    </div>
+                    <div class="input-group input-group-custom">
+                      <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                      <input type="password" id="loginPasswordInput" class="form-control" placeholder="••••••••" required>
+                      <button type="button" class="btn btn-link text-muted pe-3 text-decoration-none" onclick="togglePasswordVisibility()">
+                        <i class="fa-regular fa-eye" id="togglePasswordIcon"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div class="form-check">
+                      <input class="form-check-input" type="checkbox" id="rememberMeCheck" checked>
+                      <label class="form-check-label small text-muted" for="rememberMeCheck">Keep me signed in</label>
+                    </div>
+                    <span class="badge bg-light text-muted border small py-1 px-2">
+                      <i class="fa-solid fa-bolt text-warning me-1"></i> Instant Auth
+                    </span>
+                  </div>
+
+                  <button type="submit" id="loginSubmitBtn" class="btn btn-gradient-primary w-100 py-3 fw-bold fs-6 mb-3 shadow">
+                    <i class="fa-solid fa-right-to-bracket me-2"></i> Sign In to Portal
+                  </button>
+                </form>
+
+                <!-- 1-Click Quick Demo Accounts Box -->
+                <div class="mt-4 pt-3 border-top">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="text-uppercase small fw-bold text-muted" style="letter-spacing: 0.05em; font-size: 0.72rem;">
+                      <i class="fa-solid fa-bolt text-warning me-1"></i> 1-Click Quick Demo Accounts:
+                    </span>
+                    <span class="badge bg-primary-subtle text-primary small">Click to Sign In</span>
+                  </div>
+                  <div class="row g-2 small">
+                    <div class="col-6">
+                      <div class="demo-role-card d-flex align-items-center gap-2" onclick="quickFillAndLogin('admin', 'admin123')">
+                        <div class="rounded-circle bg-danger-subtle text-danger d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; flex-shrink: 0;">
+                          <i class="fa-solid fa-shield"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                          <div class="fw-bold text-dark lh-1 text-truncate">Chief Admin</div>
+                          <small class="text-muted" style="font-size: 0.7rem;">admin / admin123</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="demo-role-card d-flex align-items-center gap-2" onclick="quickFillAndLogin('dr.sarah', 'doctor123')">
+                        <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; flex-shrink: 0;">
+                          <i class="fa-solid fa-user-doctor"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                          <div class="fw-bold text-dark lh-1 text-truncate">Dr. Sarah (Cardio)</div>
+                          <small class="text-muted" style="font-size: 0.7rem;">dr.sarah / doctor123</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="demo-role-card d-flex align-items-center gap-2" onclick="quickFillAndLogin('dr.chen', 'doctor123')">
+                        <div class="rounded-circle bg-success-subtle text-success d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; flex-shrink: 0;">
+                          <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                          <div class="fw-bold text-dark lh-1 text-truncate">Dr. Chen (Neuro)</div>
+                          <small class="text-muted" style="font-size: 0.7rem;">dr.chen / doctor123</small>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-6">
+                      <div class="demo-role-card d-flex align-items-center gap-2" onclick="quickFillAndLogin('john.doe', 'patient123')">
+                        <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; flex-shrink: 0;">
+                          <i class="fa-solid fa-user"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                          <div class="fw-bold text-dark lh-1 text-truncate">John Doe (Patient)</div>
+                          <small class="text-muted" style="font-size: 0.7rem;">john.doe / patient123</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bottom link to register -->
+                <div class="text-center mt-4 pt-3 border-top">
+                  <span class="text-muted small">Need an account? </span>
+                  <button type="button" class="btn btn-link p-0 fw-bold text-primary text-decoration-none small" onclick="switchAuthMode('register')">
+                    Register a New Account Here <i class="fa-solid fa-arrow-right ms-1"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- ============================================== -->
+              <!-- PANEL 2: REGISTRATION FORM                     -->
+              <!-- ============================================== -->
+              <div id="panel-register" class="d-none">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                  <div>
+                    <h4 class="fw-bold text-dark mb-0">Create New Account</h4>
+                    <p class="text-muted small mb-0">Fill in the details to register into the system</p>
+                  </div>
+                  <!-- Autofill sample button -->
+                  <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-bold" onclick="autofillRegistrationSample()">
+                    <i class="fa-solid fa-wand-magic-sparkles text-warning me-1"></i> 1-Click Auto Fill
+                  </button>
+                </div>
+
+                <form id="registerForm" onsubmit="handleRegisterSubmit(event)">
+                  <!-- Role Type Select -->
+                  <div class="mb-3">
+                    <label class="form-label small fw-bold text-muted text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.05em;">Registering As</label>
+                    <div class="d-flex gap-2">
+                      <div class="form-check form-check-inline border rounded-3 p-2 px-3 flex-fill bg-light">
+                        <input class="form-check-input" type="radio" name="regRoleType" id="rolePatientRadio" value="ROLE_PATIENT" checked onchange="toggleRegRoleFields()">
+                        <label class="form-check-label fw-bold text-dark small" for="rolePatientRadio"><i class="fa-solid fa-user-injured text-primary me-1"></i> Patient Account</label>
+                      </div>
+                      <div class="form-check form-check-inline border rounded-3 p-2 px-3 flex-fill bg-light">
+                        <input class="form-check-input" type="radio" name="regRoleType" id="roleDoctorRadio" value="ROLE_DOCTOR" onchange="toggleRegRoleFields()">
+                        <label class="form-check-label fw-bold text-dark small" for="roleDoctorRadio"><i class="fa-solid fa-user-doctor text-success me-1"></i> Doctor / Staff</label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row g-2 mb-3">
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">Full Legal Name *</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-signature"></i></span>
+                        <input type="text" id="regFullName" class="form-control" placeholder="e.g. Eleanor Vance" required>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">Username *</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-at"></i></span>
+                        <input type="text" id="regUsername" class="form-control" placeholder="e.g. eleanor.v" required>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">Email Address *</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                        <input type="email" id="regEmail" class="form-control" placeholder="e.g. eleanor@example.com" required>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">Phone Number *</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-phone"></i></span>
+                        <input type="tel" id="regPhone" class="form-control" placeholder="+1-555-0391" required>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">Password *</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" id="regPassword" class="form-control" placeholder="••••••••" required>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">Confirm Password *</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-shield-halved"></i></span>
+                        <input type="password" id="regConfirmPassword" class="form-control" placeholder="••••••••" required>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Patient Specific Section -->
+                  <div id="regPatientFields" class="row g-2 mb-3">
+                    <div class="col-sm-4">
+                      <label class="form-label small fw-bold text-muted">Date of Birth</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-regular fa-calendar"></i></span>
+                        <input type="date" id="regDob" class="form-control" value="1996-08-24">
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <label class="form-label small fw-bold text-muted">Gender</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-venus-mars"></i></span>
+                        <select id="regGender" class="form-select">
+                          <option value="Female">Female</option>
+                          <option value="Male">Male</option>
+                          <option value="Other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-sm-4">
+                      <label class="form-label small fw-bold text-muted">Blood Group</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-droplet text-danger"></i></span>
+                        <select id="regBloodGroup" class="form-select">
+                          <option value="A+">A+</option><option value="A-">A-</option>
+                          <option value="B+">B+</option><option value="B-">B-</option>
+                          <option value="O+">O+</option><option value="O-">O-</option>
+                          <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label small fw-bold text-muted">Address</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-location-dot"></i></span>
+                        <input type="text" id="regAddress" class="form-control" placeholder="742 Evergreen Terrace, Springfield">
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Doctor Specific Section -->
+                  <div id="regDoctorFields" class="row g-2 mb-3 d-none">
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">Department</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-hospital-user"></i></span>
+                        <select id="regDocDept" class="form-select">
+                          <option value="Cardiology">Cardiology</option>
+                          <option value="Neurology">Neurology</option>
+                          <option value="Pediatrics">Pediatrics</option>
+                          <option value="Orthopedics">Orthopedics</option>
+                          <option value="General Medicine">General Medicine</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="col-sm-6">
+                      <label class="form-label small fw-bold text-muted">Specialization</label>
+                      <div class="input-group input-group-custom">
+                        <span class="input-group-text"><i class="fa-solid fa-stethoscope"></i></span>
+                        <input type="text" id="regDocSpec" class="form-control" placeholder="e.g. Heart Rhythm & Vascular">
+                      </div>
+                    </div>
+                  </div>
+
+                  <button type="submit" id="regSubmitBtn" class="btn btn-gradient-primary w-100 py-3 fw-bold fs-6 mb-3 shadow">
+                    <i class="fa-solid fa-user-check me-2"></i> Register Account & Sign In Now
+                  </button>
+                </form>
+
+                <!-- Bottom link to sign in -->
+                <div class="text-center mt-4 pt-3 border-top">
+                  <span class="text-muted small">Already have an account? </span>
+                  <button type="button" class="btn btn-link p-0 fw-bold text-primary text-decoration-none small" onclick="switchAuthMode('login')">
+                    Sign In to Existing Account <i class="fa-solid fa-arrow-right ms-1"></i>
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="py-3 text-center text-muted small mt-auto">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+      <div>&copy; 2026 ApexCare Hospital Management System. All rights reserved.</div>
+      <div class="d-flex gap-3">
+        <a href="register.html" class="text-muted text-decoration-none">Dedicated Register Page</a>
+        <a href="index.html?guest=true" class="text-muted text-decoration-none">Guest Overview</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/store.js"></script>
+  <script src="js/api.js"></script>
+  <script>
+    // Tab Mode Switcher
+    function switchAuthMode(mode) {
+      const panelLogin = document.getElementById('panel-login');
+      const panelReg = document.getElementById('panel-register');
+      const tabLogin = document.getElementById('tab-btn-login');
+      const tabReg = document.getElementById('tab-btn-register');
+      const alertBox = document.getElementById('authAlertBox');
+      alertBox.classList.add('d-none');
+
+      if (mode === 'register') {
+        panelLogin.classList.add('d-none');
+        panelReg.classList.remove('d-none');
+        tabLogin.classList.remove('active');
+        tabReg.classList.add('active');
+      } else {
+        panelReg.classList.add('d-none');
+        panelLogin.classList.remove('d-none');
+        tabReg.classList.remove('active');
+        tabLogin.classList.add('active');
+      }
+    }
+
+    // Role switcher on Login tab
+    function selectRole(role) {
+      document.querySelectorAll('.role-filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-role') === role);
+      });
+      const userInput = document.getElementById('loginUsernameInput');
+      if (role === 'admin') userInput.placeholder = "Enter admin username (e.g. admin)";
+      else if (role === 'doctor') userInput.placeholder = "Enter doctor username (e.g. dr.sarah, dr.chen)";
+      else if (role === 'patient') userInput.placeholder = "Enter patient username (e.g. john.doe, jane.smith)";
+      else userInput.placeholder = "Enter username (e.g. admin, dr.sarah, john.doe)";
+    }
+
+    function togglePasswordVisibility() {
+      const input = document.getElementById('loginPasswordInput');
+      const icon = document.getElementById('togglePasswordIcon');
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'fa-regular fa-eye-slash';
+      } else {
+        input.type = 'password';
+        icon.className = 'fa-regular fa-eye';
+      }
+    }
+
+    function toggleRegRoleFields() {
+      const isDoc = document.getElementById('roleDoctorRadio').checked;
+      document.getElementById('regPatientFields').classList.toggle('d-none', isDoc);
+      document.getElementById('regDoctorFields').classList.toggle('d-none', !isDoc);
+    }
+
+    function showAlert(msg, type = 'danger') {
+      const alertBox = document.getElementById('authAlertBox');
+      alertBox.className = `alert alert-${type} py-2 small mb-3 border`;
+      alertBox.innerHTML = (type === 'success' ? '<i class="fa-solid fa-circle-check me-2"></i>' : '<i class="fa-solid fa-triangle-exclamation me-2"></i>') + msg;
+      alertBox.classList.remove('d-none');
+    }
+
+    function showDemoPasswordHelp() {
+      alert("Demo Accounts:\n• Admin: admin / admin123\n• Doctors: dr.sarah, dr.chen / doctor123\n• Patients: john.doe, jane.smith / patient123");
+    }
+
+    async function performLogin(username, password) {
+      const btn = document.getElementById('loginSubmitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Authenticating...';
+
+      try {
+        const res = await HospitalAPI.login(username, password);
+        if (res && res.success) {
+          showAlert(`Welcome back, ${res.user.fullName}! Redirecting to portal...`, 'success');
+          
+          let targetPortal = 'patient';
+          if (res.user.role === 'ROLE_ADMIN') targetPortal = 'admin';
+          else if (res.user.role === 'ROLE_DOCTOR') targetPortal = 'doctor';
+
+          setTimeout(() => {
+            window.location.href = `index.html?portal=${targetPortal}`;
+          }, 600);
+        } else {
+          showAlert((res && res.message) || 'Invalid username or password', 'danger');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-2"></i> Sign In to Portal';
+        }
+      } catch (err) {
+        showAlert('Login error: ' + err.message, 'danger');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-2"></i> Sign In to Portal';
+      }
+    }
+
+    function quickFillAndLogin(u, p) {
+      document.getElementById('loginUsernameInput').value = u;
+      document.getElementById('loginPasswordInput').value = p;
+      performLogin(u, p);
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const u = document.getElementById('loginUsernameInput').value.trim();
+      const p = document.getElementById('loginPasswordInput').value;
+      performLogin(u, p);
+    }
+
+    function autofillRegistrationSample() {
+      const rand = Math.floor(100 + Math.random() * 900);
+      document.getElementById('regFullName').value = 'Eleanor Vance';
+      document.getElementById('regUsername').value = 'eleanor.' + rand;
+      document.getElementById('regEmail').value = 'eleanor' + rand + '@hospital.com';
+      document.getElementById('regPhone').value = '+1-555-0391';
+      document.getElementById('regPassword').value = 'patient123';
+      document.getElementById('regConfirmPassword').value = 'patient123';
+      showAlert('Sample registration data filled! Click "Register Account & Sign In Now".', 'info');
+    }
+
+    async function handleRegisterSubmit(e) {
+      e.preventDefault();
+
+      const fullName = document.getElementById('regFullName').value.trim();
+      const username = document.getElementById('regUsername').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirmPassword = document.getElementById('regConfirmPassword').value;
+      const isDoctor = document.getElementById('roleDoctorRadio').checked;
+
+      if (password !== confirmPassword) {
+        return showAlert('Passwords do not match. Please re-enter.');
+      }
+
+      const btn = document.getElementById('regSubmitBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Registering Account...';
+
+      const payload = {
+        fullName,
+        username,
+        email,
+        phone,
+        password,
+        role: isDoctor ? 'ROLE_DOCTOR' : 'ROLE_PATIENT'
+      };
+
+      if (isDoctor) {
+        payload.department = document.getElementById('regDocDept').value;
+        payload.specialization = document.getElementById('regDocSpec').value.trim() || 'Clinical Practice';
+      } else {
+        payload.dateOfBirth = document.getElementById('regDob').value || '1996-08-24';
+        payload.gender = document.getElementById('regGender').value;
+        payload.bloodGroup = document.getElementById('regBloodGroup').value;
+        payload.address = document.getElementById('regAddress').value.trim() || '';
+      }
+
+      try {
+        const res = await HospitalAPI.register(payload);
+        if (res && res.success) {
+          showAlert(`Welcome, ${res.user.fullName}! Account registered successfully. Redirecting...`, 'success');
+          let targetPortal = isDoctor ? 'doctor' : 'patient';
+          setTimeout(() => {
+            window.location.href = `index.html?portal=${targetPortal}`;
+          }, 700);
+        } else {
+          showAlert((res && res.message) || 'Registration failed. Username may already exist.', 'danger');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-user-check me-2"></i> Register Account & Sign In Now';
+        }
+      } catch (err) {
+        showAlert('Registration error: ' + err.message, 'danger');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-user-check me-2"></i> Register Account & Sign In Now';
+      }
+    }
+
+    // Check if mode=register in URL
+    document.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('mode') === 'register') {
+        switchAuthMode('register');
+      }
+    });
+  </script>
+</body>
+</html>
